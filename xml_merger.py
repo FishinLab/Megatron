@@ -120,8 +120,8 @@ class Mario(object):
                         if(ele.attrib["name"] in tmp_removed_rec and "0" != ele.attrib["errors"]):
                             ele.attrib["errors"] = "0"
                             ele.attrib.pop("message")
-        i = i + 1
-    self.result_tree = mergee_tree
+            i = i + 1
+        self.result_tree = mergee_tree
 #DEBUG:
 #   for tmp in tmp_removed_rec:
 #       print >> sys.stdout, tmp

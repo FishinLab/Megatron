@@ -125,7 +125,8 @@ class html_parser(HTMLParser):
     def replace_summary_data(self, nums = {"Passed Script Number":0, "Error Script Number":0, "Rate Percent Number":0}): 
         self.data = nums[data]
         
-    def generate_model_table(self, template_path = "")
+    def generate_model_table(self, template_path = ""):
+        pass
 
 if __name__ == "__main__":
     default_xmls_path = ".\\"
@@ -142,9 +143,9 @@ if __name__ == "__main__":
     for f in report_names:
 		reporter.parse_xml(default_xmls_path + f)
 
-    total_succ =  
-    total_error = 
-    rate_percent = 
+#    total_succ = 0 
+#    total_error = 0
+#    rate_percent = 0
     
 #   parser.generate_xml(default_xmls_path + "report\\report.xml", template_path)
     
