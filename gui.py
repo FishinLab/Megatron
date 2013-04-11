@@ -15,30 +15,47 @@ default_bar_width = 120
 
 def do_merge():
 #this button function is to read parameters from setting.conf file, and do merge job
-    fd_conf = open(os.getcwd() + "setting.conf", r)
-    fd_content = fd_conf.read()
-    fd_conf.close()
-
-    fd_content.
+    print >> sys.stdout, "clicked merge button"
 
 def do_deploy():
+#this button function is to deploy the html report with outlook to the boss
+#because of the environment, this fucntion should be done with exists jar package
+    print >> sys.stdout, "clicked deploy button"
 
 def do_setting():
+#this button function is to set parameters such like xml, html report path, email client and so on
+#using JSON file style to store users'  report parameters
+    fd_setting = file(getcwd() + "setting.conf", "w")
+    print >> fd_setting, "here is a setting test"
 
 def run():
     global default_height
     global default_width
-    global default_bar_height
-    global default_bar_width
+    #global default_bar_height
+    #global default_bar_width
 
     Megatron_main = Frame(master = None) 
-    Megatron_bar = Frame(master = Megatron_main)
+    Megatron_main.grid(row = 0, column = 0)
+    #Megatron_bar = Frame(master = Megatron_main)
+    #Megatron_info = Frame(master = None)
+    #Megatron_info.grid(row = 1, column = 0)
 
-    can_main = Canvas(master = Megatron_main, height = default_height, width = default_width)
+    can_main = Canvas(master = Megatron_main, height = default_height, width = default_width, bg = "black") 
     can_main.grid(row = 0, column = 0)
 
-    can_bar = Canvas(master = Megatron_bar, height = default_bar_height, width = default_bar_width)
-    can_bar.grid()
+    can_merge = Canvas(master = Megatron_main, bg = "yellow", height = 40, width = default_width)
+    can_merge.grid(row = 1, column = 0)
+
+    can_deploy= Canvas(master = Megatron_main, bg = "red", height = 40, width = default_width)
+    can_deploy.grid(row = 2, column = 0)
+
+    can_setting= Canvas(master = Megatron_main, bg = "blue", height = 40, width = default_width)
+    can_setting.grid(row = 3, column = 0)
+    #can_info = Canvas(master = Megatron_info, bg = "red")
+    #can_info.grid(row = 1, column = 0)
+
+    #can_bar = Canvas(master = Megatron_bar, height = default_bar_height, width = default_bar_width)
+    #can_bar.grid()
 
     butt_merge = Button(master = Megatron_main, text = "merge", command = do_merge)
     butt_merge.grid(row = 1, column = 1)

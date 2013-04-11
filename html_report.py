@@ -18,7 +18,7 @@ type_info = "Info"
 
 class html_reporter(object):
 
-    def __init__(self, reports_path = ".\\", report_names = []):
+    def __init__(self, reports_path = os.getcwd(), report_names = []):
         self.reports_path = reports_path
         self.report_names = report_names
         self.total = {}
@@ -34,7 +34,7 @@ class html_reporter(object):
             xml_report = ET.parse(file_path)
             xml_root = xml_report.getroot()
             shutdown_msgs = xml_root.findall(self.msg_path)
-            model_name = (file_path.split("\\")[1]).split(".")[0]
+            model_name = (file_path.split(os.sep)[1]).split(".")[0]
             
             for msg in shutdown_msgs:
                 if( type_verification == msg.attrib["Type"]):
@@ -85,7 +85,7 @@ class html_reporter(object):
         xsl_style = libxml2.parseFile(xsl_path)
         xsl = libxslt.parseStylesheetDoc(xml_style)
         week_report = xsl.applyStyleSheet(xml)
-        xsl.saveResultToFilename(".\\", week_report, 0)
+        xsl.saveResultToFilename(os.getcwd(), week_report, 0)
 
     def report_generate(self, storage_path):
         dir_list = os.listdir("current path")
@@ -104,34 +104,56 @@ class html_reporter(object):
         scp_err_num = sum(self.results.values())
         scp_passed_num = scp_sum_num - scp_err_num
 
-class html_parser(HTMLParser):
-    def __init__(self):
-        self.tag = ""
-        self.reading_flag = False
-        self.data = [] 
-        self.replace_text = ["Passed Script Number", "Error Script Number" , "Rate Percent Number"]
-        HTMLParser.__init__(self)
+#    def __init__(self, passed_num, error_num, rate_percent):
+#        self.rexpresses = ["Passed Script Number", "Error Script Number", "Rate Percent Number"]
+#        self.passed_num = passed_num 
+#        self.error_num = error_num
+#        self.rate_percent = rate_percent
 
-    def handle_starttag(self, tag, data):
-        if "span" == tag:
-            if data in self.replace_data:
-                self.reading_flag = True
-                self.data.append(data)
+    def load_table_template(self):
+        fd_table_template = file(os.getcwd() + "html_templates" + os.sep + "temp_table.html", "r") 
+        table_template = fd_table_template.read()
+        fd_table_template.close()
+        return table_template
+    
+    def load_summary_template(self):
+        fd_summary_template = file(os.getcwd() + "html_templates" + os.sep + "summary.html", "r")
+        summary_template = fd_summary_template.read()
+        fd_summary_template.close()
+        return summary_template
 
-    def handle_endtag(self, tag):
-        if self.reading_flag:
-            self.reading_flag = False
-
-    def replace_summary_data(self, nums = {"Passed Script Number":0, "Error Script Number":0, "Rate Percent Number":0}): 
-        self.data = nums[data]
-        
-    def generate_model_table(self, template_path = ""):
+    def generate_html_report(self, table_template, summary_template):
         pass
 
+#class html_parser(HTMLParser):
+#    def __init__(self):
+#        self.tag = ""
+#        self.reading_flag = False
+#        self.data = [] 
+#        self.replace_text = ["Passed Script Number", "Error Script Number" , "Rate Percent Number"]
+#        HTMLParser.__init__(self)
+
+#    def handle_starttag(self, tag, data):
+#        if "span" == tag:
+#            if data in self.replace_data:
+#                self.reading_flag = True
+#                self.data.append(data)
+
+#    def handle_endtag(self, tag):
+#        if self.reading_flag:
+#            self.reading_flag = False
+
+#    def replace_summary_data(self, nums = {"Passed Script Number":0, "Error Script Number":0, "Rate Percent Number":0}): 
+#        self.data = nums[data]
+        
+#    def generate_model_table(self, template_path = ""):
+#        pass
+
+           
 if __name__ == "__main__":
-    default_xmls_path = ".\\"
-    xsl_sheet_path = ".\\report.xsl"
-    template_path = ".\\report\\report_temp.xml"
+    default_xmls_path = os.getcwd()
+    xsl_sheet_path = os.getcwd() + "report.xsl"
+    template_path = os.getcwd() + "report" + os.sep +"report_temp.xml"
 
     report_names = []
     for f in os.listdir(default_xmls_path):
@@ -143,9 +165,12 @@ if __name__ == "__main__":
     for f in report_names:
 		reporter.parse_xml(default_xmls_path + f)
 
-#    total_succ = 0 
-#    total_error = 0
-#    rate_percent = 0
+    total_num = 0 
+    total_error = 0
+    
+    for mod in reporter.total:
+        total_num += int(reporter.total[mod]) 
+        total_error += int(reporter.result[mod])
     
 #   parser.generate_xml(default_xmls_path + "report\\report.xml", template_path)
     
