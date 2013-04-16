@@ -2,6 +2,7 @@
 
 import os
 import sys
+import re
 from xml import etree
 from xml.etree import ElementTree as ET
 from xml.etree.ElementTree import Element as E
@@ -24,6 +25,7 @@ class html_reporter(object):
         self.total = {}
         self.results = {}
         self.msg_path = "Shutdown/Message"
+        self.re_expresses = ["Passed Script Number", "Error Script Number", "Rate Percent Number"] 
 
     def parse_xml(self, file_path):
         global type_error
@@ -87,69 +89,57 @@ class html_reporter(object):
         week_report = xsl.applyStyleSheet(xml)
         xsl.saveResultToFilename(os.getcwd(), week_report, 0)
 
-    def report_generate(self, storage_path):
-        dir_list = os.listdir("current path")
-        template_list = [template_path, temp_table_path, sum_path]
-        template_map = {}
+    def generate_html_report(self):
+        succ_num = sum(self.total.values()) - sum(self.results.values())
+        failed_num = sum(self.total.values()) - succ_num
+        succ_rate = succ_num / (sum(self.total.values()))
+#replace the flag with, success script number, failure script number and success rate  
+        fd_sum_temp = file(getcwd() + "html_templates/summary_template.html", "r")
+        fd_sum_content = fd_sum_temp.read()
+        fd_sum_temp.close()
 
-        for temp in template_list:
-            if temp in dir_list:
-                tmp_fd = open(temp, "r")
-                template_content = tmp_fd.read()
-                template_map[temp.split("."[1])] = template_content
-            else:
-                print("template files are not completed")
-                #sys.exit(0)  
-        scp_sum_num = sum(self.total.values()) 
-        scp_err_num = sum(self.results.values())
-        scp_passed_num = scp_sum_num - scp_err_num
+        ex_succ_num = re.compile(self.re_expresses[0]) 
+        fd_sum_content.replace(fd_sum_content.findall(ex_succ_num)[0], succ_num)
 
-#    def __init__(self, passed_num, error_num, rate_percent):
-#        self.rexpresses = ["Passed Script Number", "Error Script Number", "Rate Percent Number"]
-#        self.passed_num = passed_num 
-#        self.error_num = error_num
-#        self.rate_percent = rate_percent
+        ex_fail_num = re.compile(self.re_expresses[1])
+        fd_sum_content.replace(fd_sum_content.findall(ex_fail_num)[0], failed_num)
 
-    def load_table_template(self):
-        fd_table_template = file(os.getcwd() + "html_templates" + os.sep + "temp_table.html", "r") 
-        table_template = fd_table_template.read()
-        fd_table_template.close()
-        return table_template
-    
-    def load_summary_template(self):
-        fd_summary_template = file(os.getcwd() + "html_templates" + os.sep + "summary.html", "r")
-        summary_template = fd_summary_template.read()
-        fd_summary_template.close()
-        return summary_template
+        ex_rate_num = re.compile(self.re_expresses[2])
+        fd_sum_content.replace_text(fd_sum_content.findall(ex_rate_num)[0] , succ_rate)
+#append summary html template to the whole html report
+        temp_fd = file(os.getcwd() + "html_templates/temp_header.html", "r")
+        final_html_report += temp_fd.read()
+        temp_fd.close()
+        final_html_report += fd_sum_content
 
-    def generate_html_report(self, table_template, summary_template):
-        pass
+#replace the flag with each model name and specific number
+        ex_mod_name = re.compile("MODEL NAME")
+        ex_total_num = re.compile("TOTAL NUMBER")
+        ex_error_num = re.compile("ERROR NUMBER")
 
-#class html_parser(HTMLParser):
-#    def __init__(self):
-#        self.tag = ""
-#        self.reading_flag = False
-#        self.data = [] 
-#        self.replace_text = ["Passed Script Number", "Error Script Number" , "Rate Percent Number"]
-#        HTMLParser.__init__(self)
+        fd_temp = file(getcwd() + "html_templates/temp_table.html", "r")
+        temp_table_con = fd_temp.read()
+        fd_temp.close()
 
-#    def handle_starttag(self, tag, data):
-#        if "span" == tag:
-#            if data in self.replace_data:
-#                self.reading_flag = True
-#                self.data.append(data)
+        for mod in self.total:
+            cop_temp_table_con = deepcopy(temp_table_con)
 
-#    def handle_endtag(self, tag):
-#        if self.reading_flag:
-#            self.reading_flag = False
+            cop_temp_table_con.replace(ex_mod_name.findall(temp_table_con)[0], mod)
+            cop_temp_table_con.replace(ex_total_num.findall(temp_table_con)[0], total[mod])
+            cop_temp_table_con.replace(ex_error_num.findall(temp_table_con)[0], results[mod])
 
-#    def replace_summary_data(self, nums = {"Passed Script Number":0, "Error Script Number":0, "Rate Percent Number":0}): 
-#        self.data = nums[data]
-        
-#    def generate_model_table(self, template_path = ""):
-#        pass
+            final_html_report += cop_temp_table_con             
+#depends on which server to generate this file path
+        temp_fd = file(os.getcwd() + "html_templates/temp_tailer.html", "r")
+        final_html_report += temp_fd.read()
+        temp_fd.close()
+        final_report = file(os.getcwd() + "final_report", "w")
+        final_report.write(final_html_report)
+#FIXME:
+#in function generate_html_report: I use regular express to get the flag to replace with what I want to write in 
+#compiled regular express is more effective that using string to replace, and the this function time duration is O(n)
+#how to fix this defect with html parser? I think if that works, function time duration will be O(lgn)
 
-           
 if __name__ == "__main__":
     default_xmls_path = os.getcwd()
     xsl_sheet_path = os.getcwd() + "report.xsl"
@@ -165,13 +155,7 @@ if __name__ == "__main__":
     for f in report_names:
 		reporter.parse_xml(default_xmls_path + f)
 
-    total_num = 0 
-    total_error = 0
-    
-    for mod in reporter.total:
-        total_num += int(reporter.total[mod]) 
-        total_error += int(reporter.result[mod])
-    
+    reporter.generate_html_report()
 #   parser.generate_xml(default_xmls_path + "report\\report.xml", template_path)
     
 #FIXME: Because of parser.transmit method depends on libxml2 and libxslt,

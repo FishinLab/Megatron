@@ -5,7 +5,6 @@ from Tkinter import *
 from xml_merger import Mario
 from xml_parser import Luigi
 from html_report import html_reporter 
-from html_report import html_parser
 
 default_height = 480
 default_width = 640
