@@ -3,6 +3,7 @@
 import os
 import sys
 import re
+from copy import deepcopy
 from xml import etree
 from xml.etree import ElementTree as ET
 from xml.etree.ElementTree import Element as E
@@ -36,7 +37,7 @@ class html_reporter(object):
             xml_report = ET.parse(file_path)
             xml_root = xml_report.getroot()
             shutdown_msgs = xml_root.findall(self.msg_path)
-            model_name = (file_path.split(os.sep)[1]).split(".")[0]
+            model_name = (file_path.split(os.sep)[-1]).split(".")[0]
             
             for msg in shutdown_msgs:
                 if( type_verification == msg.attrib["Type"]):
@@ -92,22 +93,30 @@ class html_reporter(object):
     def generate_html_report(self):
         succ_num = sum(self.total.values()) - sum(self.results.values())
         failed_num = sum(self.total.values()) - succ_num
-        succ_rate = succ_num / (sum(self.total.values()))
+        tmp_str = str(float(succ_num) / (sum(self.total.values())))
+        tmp_str = tmp_str.split(".")[1]
+        succ_rate = tmp_str[0:2] + "." + tmp_str[2:4] + "%" 
 #replace the flag with, success script number, failure script number and success rate  
-        fd_sum_temp = file(getcwd() + "html_templates/summary_template.html", "r")
+        fd_sum_temp = file(os.getcwd() + os.sep + "html_templates/summary.html", "r")
         fd_sum_content = fd_sum_temp.read()
         fd_sum_temp.close()
 
         ex_succ_num = re.compile(self.re_expresses[0]) 
-        fd_sum_content.replace(fd_sum_content.findall(ex_succ_num)[0], succ_num)
+        fd_sum_content = fd_sum_content.replace(ex_succ_num.findall(fd_sum_content)[0], str(succ_num))
+        #fd_sum_content.replace("Passed Script Number", str(succ_num))
 
         ex_fail_num = re.compile(self.re_expresses[1])
-        fd_sum_content.replace(fd_sum_content.findall(ex_fail_num)[0], failed_num)
+        fd_sum_content = fd_sum_content.replace(ex_fail_num.findall(fd_sum_content)[0], str(failed_num))
+        #fd_sum_content.replace("Error Script Number", str(failed_num))
 
         ex_rate_num = re.compile(self.re_expresses[2])
-        fd_sum_content.replace_text(fd_sum_content.findall(ex_rate_num)[0] , succ_rate)
+        fd_sum_content = fd_sum_content.replace(ex_rate_num.findall(fd_sum_content)[0], succ_rate)    
+        #fd_sum_content.replace("Rate Percent Number", str(succ_rate))
+#DEBUG 
+#        print >> sys.stdout, fd_sum_content
 #append summary html template to the whole html report
-        temp_fd = file(os.getcwd() + "html_templates/temp_header.html", "r")
+        temp_fd = file(os.getcwd() + os.sep + "html_templates/temp_header.html", "r")
+        final_html_report = ""
         final_html_report += temp_fd.read()
         temp_fd.close()
         final_html_report += fd_sum_content
@@ -117,23 +126,28 @@ class html_reporter(object):
         ex_total_num = re.compile("TOTAL NUMBER")
         ex_error_num = re.compile("ERROR NUMBER")
 
-        fd_temp = file(getcwd() + "html_templates/temp_table.html", "r")
+        fd_temp = file(os.getcwd() + os.sep + "html_templates/temp_table.html", "r")
         temp_table_con = fd_temp.read()
         fd_temp.close()
 
         for mod in self.total:
             cop_temp_table_con = deepcopy(temp_table_con)
-
-            cop_temp_table_con.replace(ex_mod_name.findall(temp_table_con)[0], mod)
-            cop_temp_table_con.replace(ex_total_num.findall(temp_table_con)[0], total[mod])
-            cop_temp_table_con.replace(ex_error_num.findall(temp_table_con)[0], results[mod])
+            cop_temp_table_con = cop_temp_table_con.replace(ex_mod_name.findall(temp_table_con)[0], mod)
+            cop_temp_table_con = cop_temp_table_con.replace(ex_total_num.findall(temp_table_con)[0], str(self.total[mod]))
+            cop_temp_table_con = cop_temp_table_con.replace(ex_error_num.findall(temp_table_con)[0], str(self.results[mod]))
+            #cop_temp_table_con = cop_temp_table_con.replace("MODEL NAME", mod)
+            #cop_temp_table_con = cop_temp_table_con.replace("TOTAL NUMBER", str(self.total[mod]))
+            #cop_temp_table_con = cop_temp_table_con.replace("ERROR NUMBER", str(self.results[mod]))
 
             final_html_report += cop_temp_table_con             
+#DEBUG
+#        print >> sys.stdout, self.results
+#        print >> sys.stdout, self.total
 #depends on which server to generate this file path
-        temp_fd = file(os.getcwd() + "html_templates/temp_tailer.html", "r")
+        temp_fd = file(os.getcwd() + os.sep + "html_templates/temp_tailer.html", "r")
         final_html_report += temp_fd.read()
         temp_fd.close()
-        final_report = file(os.getcwd() + "final_report", "w")
+        final_report = file(os.getcwd() + os.sep + "final_report.html", "w")
         final_report.write(final_html_report)
 #FIXME:
 #in function generate_html_report: I use regular express to get the flag to replace with what I want to write in 
