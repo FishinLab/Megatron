@@ -38,6 +38,9 @@ class html_reporter(object):
             xml_root = xml_report.getroot()
             shutdown_msgs = xml_root.findall(self.msg_path)
             model_name = (file_path.split(os.sep)[-1]).split(".")[0]
+#FIXME:
+# i want to get the model name acording to file name,
+# now here is a bug that, parse_file method must accept absolute file path
             
             for msg in shutdown_msgs:
                 if( type_verification == msg.attrib["Type"]):
@@ -97,7 +100,7 @@ class html_reporter(object):
         tmp_str = tmp_str.split(".")[1]
         succ_rate = tmp_str[0:2] + "." + tmp_str[2:4] + "%" 
 #replace the flag with, success script number, failure script number and success rate  
-        fd_sum_temp = file(os.getcwd() + os.sep + "html_templates/summary.html", "r")
+        fd_sum_temp = file(os.getcwd() + os.sep + "html_templates" + os.sep +"summary.html", "r")
         fd_sum_content = fd_sum_temp.read()
         fd_sum_temp.close()
 
@@ -115,7 +118,7 @@ class html_reporter(object):
 #DEBUG 
 #        print >> sys.stdout, fd_sum_content
 #append summary html template to the whole html report
-        temp_fd = file(os.getcwd() + os.sep + "html_templates/temp_header.html", "r")
+        temp_fd = file(os.getcwd() + os.sep + "html_templates" + os.sep +"temp_header.html", "r")
         final_html_report = ""
         final_html_report += temp_fd.read()
         temp_fd.close()
@@ -126,7 +129,7 @@ class html_reporter(object):
         ex_total_num = re.compile("TOTAL NUMBER")
         ex_error_num = re.compile("ERROR NUMBER")
 
-        fd_temp = file(os.getcwd() + os.sep + "html_templates/temp_table.html", "r")
+        fd_temp = file(os.getcwd() + os.sep + "html_templates" + os.sep +"temp_table.html", "r")
         temp_table_con = fd_temp.read()
         fd_temp.close()
 
@@ -144,7 +147,7 @@ class html_reporter(object):
 #        print >> sys.stdout, self.results
 #        print >> sys.stdout, self.total
 #depends on which server to generate this file path
-        temp_fd = file(os.getcwd() + os.sep + "html_templates/temp_tailer.html", "r")
+        temp_fd = file(os.getcwd() + os.sep + "html_templates" + os.sep + "temp_tailer.html", "r")
         final_html_report += temp_fd.read()
         temp_fd.close()
         final_report = file(os.getcwd() + os.sep + "final_report.html", "w")
