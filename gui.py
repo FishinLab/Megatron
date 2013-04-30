@@ -31,9 +31,9 @@ def do_merge():
                 para_pathes[ex_pathes[i]] = (ex_tmp.findall(fd_config)[0]).strip(ex_pathes[i])
             merger, mergee, result = para_pathes.values()
 #DEBUG: 
-            print >> sys.stdout, merger
-            print >> sys.stdout, mergee
-            print >> sys.stdout, result 
+#           print >> sys.stdout, merger
+#           print >> sys.stdout, mergee
+#           print >> sys.stdout, result 
             m = Mario()
             m.load_merger_file(merger)
             m.load_mergee_file(mergee)
@@ -44,7 +44,18 @@ def do_merge():
             m.generate_xml_tree(m.result_tree, result)
         except:
             print >> sys.stdout, "define parameters firstly"
-            return 
+#           return 
+#DEBUG
+    global default_width
+    global default_height
+    l = Luigi()
+    l.pick_fail_scp_out("/Developer/repo/sap_project/EEF/DataManager.xml")
+    sum_fail_scp_info = "" 
+    for fail_scp in l.f_scp_name:
+        fail_scp += "\n"
+        sum_fail_scp_info += fail_scp
+    mess_info = Message(master = None, text = sum_fail_scp_info, width = default_width)
+    mess_info.place(x = 0, y = 0, width = default_width, height = default_height)
     print >> sys.stdout, "clicked merge button"
 
 def do_deploy():
@@ -73,40 +84,58 @@ def do_deploy():
 
     reporter.generate_html_report()
     print >> sys.stdout, "clicked deploy button"
-
+#flag = False
 def do_setting():
 #this button function is to set parameters such like xml, html report path, email client and so on
 #using JSON file style to store users'  report parameters
-    print >> sys.stdout, "here is a setting test"
+    global default_height
+    global default_width
+    
+    entry_para = Entry(maste = None, selectbackground = "red")
+    entry_para.place(x = 5, y = 5, height = default_height - 10, width = default_width - 10)
+    entry_para.bind(sequence = "<Enter>", func = press_enter())
+
+#    entry_merger = Entry(master = None, textvariable = de_merger_v, selectbackground = "red")    
+#    entry_merger.place(x = 5, y = 45, height = 35, width = default_width)
+
+#    entry_mergee = Entry(master = None, textvariable = de_mergee_v, selectbackground = "red") 
+#    entry_mergee.place(x = 5, y = 80, height = 35, width = default_width)
+
+#    entry_reports= Entry(master = None, textvariable = de_reports_v, selectbackground = "red")
+#    entry_reports.place(x = 5, y = 120, height = 35, width = default_width)
+#    global flag 
+#    if(flag):
+#        de_merger_v.set(entry_merger.get())
+#        print >> sys.stdout, de_merger_v.get() 
+#        print >> sys.stdout, entry_mergee.get()
+#        print >> sys.stdout, entry_reports.get()
+#        flag = False 
+#    else:
+#        de_merger_v.set("MERGER_PATH")
+#        de_mergee_v.set("MERGEE_PATH")
+#        de_reports_v.set("REPORTS_PATH")
+#        flag = True 
+
+    print >> sys.stdout, "clicked setting button"
 
 def run():
     global default_height
     global default_width
-    #global default_bar_height
-    #global default_bar_width
 
     Megatron_main = Frame(master = None) 
     Megatron_main.grid(row = 0, column = 0)
-    #Megatron_bar = Frame(master = Megatron_main)
-    #Megatron_info = Frame(master = None)
-    #Megatron_info.grid(row = 1, column = 0)
 
-    can_main = Canvas(master = Megatron_main, height = default_height, width = default_width, bg = "black") 
+    can_main = Canvas(master = Megatron_main, height = default_height, width = default_width) 
     can_main.grid(row = 0, column = 0)
 
-    can_merge = Canvas(master = Megatron_main, bg = "yellow", height = 40, width = default_width)
-    can_merge.grid(row = 1, column = 0)
+#   can_merge = Canvas(master = Megatron_main, bg = "yellow", height = 40, width = default_width)
+#   can_merge.grid(row = 1, column = 0)
+    
+#   can_deploy= Canvas(master = Megatron_main, bg = "red", height = 40, width = default_width)
+#   can_deploy.grid(row = 2, column = 0)
 
-    can_deploy= Canvas(master = Megatron_main, bg = "red", height = 40, width = default_width)
-    can_deploy.grid(row = 2, column = 0)
-
-    can_setting= Canvas(master = Megatron_main, bg = "blue", height = 40, width = default_width)
-    can_setting.grid(row = 3, column = 0)
-    #can_info = Canvas(master = Megatron_info, bg = "red")
-    #can_info.grid(row = 1, column = 0)
-
-    #can_bar = Canvas(master = Megatron_bar, height = default_bar_height, width = default_bar_width)
-    #can_bar.grid()
+#   can_setting= Canvas(master = Megatron_main, bg = "blue", height = 40, width = default_width)
+#   can_setting.grid(row = 3, column = 0)
 
     butt_merge = Button(master = Megatron_main, text = "merge", command = do_merge)
     butt_merge.grid(row = 1, column = 1)

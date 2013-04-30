@@ -19,7 +19,7 @@ class Luigi(object):
             rpt_obj = minidom.parse(file_path)
 
             try:
-                ele_arr = rpt_obj.getElementByTagName("Script")
+                ele_arr = rpt_obj.getElementsByTagName("Script")
                 if(ele_arr is not None):
                     for ele in ele_arr:
                         if(ele.getAttribute("name") != "" and ele.getAttribute("errors") != "0"):
