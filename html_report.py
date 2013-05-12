@@ -98,9 +98,11 @@ class html_reporter(object):
         failed_num = sum(self.total.values()) - succ_num
         tmp_str = str(float(succ_num) / (sum(self.total.values())))
         tmp_str = tmp_str.split(".")[1]
-        succ_rate = tmp_str[0:2] + "." + tmp_str[2:4] + "%" 
+        #succ_rate = tmp_str[0:2] + "." + tmp_str[2:4] + "%" 
+        succ_rate = "".join([tmp_str[0:2], ".", tmp_str[2:4], "%"])
 #replace the flag with, success script number, failure script number and success rate  
-        fd_sum_temp = file(os.getcwd() + os.sep + "html_templates" + os.sep +"summary.html", "r")
+        #fd_sum_temp = file(os.getcwd() + os.sep + "html_templates" + os.sep +"summary.html", "r")
+        fd_sum_temp = file("".join([os.getcwd(), os.sep, "html_templates", os.sep, "summary.html"]), "r")
         fd_sum_content = fd_sum_temp.read()
         fd_sum_temp.close()
 
@@ -118,7 +120,8 @@ class html_reporter(object):
 #DEBUG 
 #        print >> sys.stdout, fd_sum_content
 #append summary html template to the whole html report
-        temp_fd = file(os.getcwd() + os.sep + "html_templates" + os.sep +"temp_header.html", "r")
+        #temp_fd = file(os.getcwd() + os.sep + "html_templates" + os.sep +"temp_header.html", "r")
+        temp_fd = file("".join([os.getcwd(), os.sep, "html_templates", os.sep, "temp_header.html"]), "r")
         final_html_report = ""
         final_html_report += temp_fd.read()
         temp_fd.close()
@@ -129,7 +132,8 @@ class html_reporter(object):
         ex_total_num = re.compile("TOTAL NUMBER")
         ex_error_num = re.compile("ERROR NUMBER")
 
-        fd_temp = file(os.getcwd() + os.sep + "html_templates" + os.sep +"temp_table.html", "r")
+        #fd_temp = file(os.getcwd() + os.sep + "html_templates" + os.sep +"temp_table.html", "r")
+        fd_temp = file("".join([os.getcwd(), os.sep, "html_templates", os.sep, "temp_table.html"]), "r")
         temp_table_con = fd_temp.read()
         fd_temp.close()
 
@@ -147,7 +151,8 @@ class html_reporter(object):
 #        print >> sys.stdout, self.results
 #        print >> sys.stdout, self.total
 #depends on which server to generate this file path
-        temp_fd = file(os.getcwd() + os.sep + "html_templates" + os.sep + "temp_tailer.html", "r")
+        #temp_fd = file(os.getcwd() + os.sep + "html_templates" + os.sep + "temp_tailer.html", "r")
+        temp_fd = file("".join([os.getcwd(), os.sep, "html_templates", os.sep, "temp_tailer.html"]), "r")
         final_html_report += temp_fd.read()
         temp_fd.close()
         final_report = file(os.getcwd() + os.sep + "final_report.html", "w")
@@ -160,7 +165,8 @@ class html_reporter(object):
 if __name__ == "__main__":
     default_xmls_path = os.getcwd()
     xsl_sheet_path = os.getcwd() + "report.xsl"
-    template_path = os.getcwd() + "report" + os.sep +"report_temp.xml"
+    #template_path = os.getcwd() + "report" + os.sep +"report_temp.xml"
+    template_path = "".join([os.getcwd(), "report", os.sep, "report_temp.xml"])
 
     report_names = []
     for f in os.listdir(default_xmls_path):

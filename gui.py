@@ -18,7 +18,8 @@ default_bar_width = 120
 #            @mergee => <string> xml file path
 #            @result => <string> xml result path
 def do_merge():
-    fd_setting = file(os.getcwd() + os.sep + "setting.conf", "r")
+    #fd_setting = file(os.getcwd() + os.sep + "setting.conf", "r")
+    fd_setting = file("".join([os.getcwd(), os.sep, "setting.conf"]), "r")
     fd_config = fd_setting.read()
     fd_setting.close()
     
@@ -49,7 +50,7 @@ def do_merge():
     global default_width
     global default_height
     l = Luigi()
-    l.pick_fail_scp_out("/Developer/repo/sap_project/EEF/DataManager.xml")
+    l.pick_fail_scp_out(mergee)
     sum_fail_scp_info = "" 
     for fail_scp in l.f_scp_name:
         fail_scp += "\n"
@@ -61,7 +62,8 @@ def do_merge():
 def do_deploy():
 #this button function is to deploy the html report with outlook to the boss
 #because of the environment, this fucntion should be done with exists jar package
-    fd_setting = file(os.getcwd() + os.sep + "setting.conf", "r")
+    #fd_setting = file(os.getcwd() + os.sep + "setting.conf", "r")
+    fd_setting = file("".join([os.getcwd(), os.sep, "setting.conf"]), "r")
     fd_config = fd_setting.read()
     fd_setting.close()
 
