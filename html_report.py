@@ -93,7 +93,7 @@ class html_reporter(object):
         week_report = xsl.applyStyleSheet(xml)
         xsl.saveResultToFilename(os.getcwd(), week_report, 0)
 
-    def generate_html_report(self):
+    def generate_html_report(self, final_report_path):
         succ_num = sum(self.total.values()) - sum(self.results.values())
         failed_num = sum(self.total.values()) - succ_num
         tmp_str = str(float(succ_num) / (sum(self.total.values())))
@@ -155,8 +155,12 @@ class html_reporter(object):
         temp_fd = file("".join([os.getcwd(), os.sep, "html_templates", os.sep, "temp_tailer.html"]), "r")
         final_html_report += temp_fd.read()
         temp_fd.close()
-        final_report = file(os.getcwd() + os.sep + "final_report.html", "w")
-        final_report.write(final_html_report)
+        if(final_report_path):
+            final_report = file(final_report_path, "w")
+            final_report.write(final_html_report)
+        else:
+            final_report = file(os.getcwd() + os.sep + "final_report.html", "w")
+            final_report.write(final_html_report)
 #FIXME:
 #in function generate_html_report: I use regular express to get the flag to replace with what I want to write in 
 #compiled regular express is more effective that using string to replace, and the this function time duration is O(n)

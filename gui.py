@@ -2,6 +2,7 @@ import Tkinter
 import os
 import re
 import sys
+import commands
 from Tkinter import *
 from xml_merger import Mario
 from xml_parser import Luigi
@@ -62,16 +63,26 @@ def do_merge():
 def do_deploy():
 #this button function is to deploy the html report with outlook to the boss
 #because of the environment, this fucntion should be done with exists jar package
-    #fd_setting = file(os.getcwd() + os.sep + "setting.conf", "r")
     fd_setting = file("".join([os.getcwd(), os.sep, "setting.conf"]), "r")
     fd_config = fd_setting.read()
     fd_setting.close()
 
     f_xmls_path = "" 
+    f_deploy_servers = []
+    f_deploy_pathes = []
     if(fd_config):
         try:
             ex_sum_models = re.compile("REPORTS_PATH:.*")
+            ex_servers = re.compile("DEPLOY_SERVER:.*")
+            ex_pathes = re.compile("FINAL_REPORT_PATH:.*")
             f_xmls_path = (ex_sum_models.findall(fd_config)[0]).strip("REPORTS_PATH:") 
+            f_deploy_info = (ex_servers.findall(fd_config)[0]).strip("DEPLOY_SERVER:") 
+            f_pathes = (ex_pathes.findall(fd_config)[0]).strip("FINAL_REPORT_PATH:") 
+            f_deploy_servers = f_deploy_info.split(",")
+            f_deploy_pathes = f_pathes.split(",") 
+            if(len(f_deploy_servers) != len(f_deploy_pathes)): 
+                print >> sys.stdout, "wrong number of parameters for deploy server and final report path"
+                return
         except:
             print >> sys.stdout, "define parameters firstly"
 
@@ -84,7 +95,18 @@ def do_deploy():
     for f in report_names:
 		reporter.parse_xml(f_xmls_path + f)
 
-    reporter.generate_html_report()
+    for dp, ds in zip(f_deploy_pathes, f_deploy_servers):    
+        print >> sys.stdout, dp
+        try:
+            reporter.generate_html_report(dp)
+            #os.system("".join(["java -jar ../jars/SendMailtoAll_", ds, ".jar"]))
+            if("" != commands.getoutput("".join(["java -jar ../jars/SendMailtoAll_", ds, ".jar"]))):
+                print >> sys.stdout, "sending email, but jar failed"
+                return 
+        except:
+            print >> sys.stdout, "when send report email to all, an exception happened"
+            return 
+
     print >> sys.stdout, "clicked deploy button"
 #flag = False
 def do_setting():
