@@ -1,3 +1,6 @@
+# vim: abstop=4 shiftwidth=4 softtabstop=4
+# email: fishinlab@sina.com
+
 from xml_parser import Luigi
 from xml.etree import ElementTree
 

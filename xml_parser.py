@@ -1,3 +1,6 @@
+# vim: abstop=4 shiftwidth=4 softtabstop=4
+# email: fishinlab@sina.com
+
 import sys
 import os
 from xml.dom import minidom

@@ -1,4 +1,5 @@
 # vim: abstop=4 shiftwidth=4 softtabstop=4
+# email: fishinlab@sina.com
 
 import os
 import sys
