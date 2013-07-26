@@ -138,6 +138,12 @@ class html_reporter(object):
         temp_table_con = fd_temp.read()
         fd_temp.close()
 
+        fd_temp = file(os.path.join("setting.conf"))
+        fd_conf = fd_temp.read()
+        fd_temp.close()
+        dep_server = fd_conf.split("DEPLOY_SERVER:")[1].strip()
+        temp_table_con = temp_table_con.replace("SERVER_NAME", dep_server)
+
         for mod in self.total:
             cop_temp_table_con = deepcopy(temp_table_con)
             cop_temp_table_con = cop_temp_table_con.replace(ex_mod_name.findall(temp_table_con)[0], mod)
@@ -148,6 +154,7 @@ class html_reporter(object):
             #cop_temp_table_con = cop_temp_table_con.replace("ERROR NUMBER", str(self.results[mod]))
 
             final_html_report += cop_temp_table_con             
+        print >> file("./tmp_http", "w"), cop_temp_table_con
 #DEBUG
 #        print >> sys.stdout, self.results
 #        print >> sys.stdout, self.total
